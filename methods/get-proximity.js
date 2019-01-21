@@ -21,8 +21,12 @@ const haversineFormula = (shipment, driver) => {
     return dist;
 }
 
+const metersToMiles = (meters) => {
+    return meters * 0.00062137
+}
+
 const getProximity = (shipment, driver) => { // haversine formula
-    return haversineFormula(shipment, driver);
+    return metersToMiles(haversineFormula(shipment, driver));
 };
 
 module.exports = {
