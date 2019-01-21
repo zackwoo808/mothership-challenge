@@ -7,9 +7,7 @@ const { getProximity } = require('../methods/get-proximity.js');
 class DispatchClient {
     constructor(shipments, drivers) {
         this.shipments = shipments;
-        this.drivers  = drivers;
-        
-        this.shipmentAccepted = false;
+        this.drivers = drivers;
 
         this.currentShipmentIndex = 0;
         this.shipmentIds = Object.keys(this.shipments);
@@ -29,6 +27,7 @@ class DispatchClient {
 
         this.interval;
         this.completedDispatch = false;
+        this.shipmentAccepted = false;
 
         this._start();
     }
@@ -89,13 +88,10 @@ class DispatchClient {
 
 // -------------------------------------------------------------------------------------------------------------- //
 
-
     async _offerShipment () { // catch block could fire if any of the axios requests returned an error
         try {
-            let count = 0;
             for (let i=0; i<3; i++) {
                 if (this.nearestDrivers[i] < this.numDrivers) { // prevents out of bounds errors
-                    //console.log(this.nearestDrivers[i], this.sortedDriverDistances[this.nearestDrivers[i]], this.driverDistances.indexOf(this.sortedDriverDistances[this.nearestDrivers[i]]));
                     this.driverResponses[i] =
                         await axios({
                             method: 'post',
@@ -110,12 +106,11 @@ class DispatchClient {
             for (let i=0; i<3; i++) {
                 let res = this.driverResponses[i];
                 if (res.data.response === 'Accepted') {
-                    console.log(`\n*** Package ${res.data.shipmentId} was ${res.data.response} by driver ${res.data.driverId} | ${this.driverDistances[res.data.driverId-1] + " miles away"} ***\n`);
+                    console.log(`\n*** Package ${res.data.shipmentId} was ${res.data.response} by driver ${res.data.driverId} | ${this.driverDistances[res.data.driverId-1].toFixed(2) + " miles away"} ***\n`);
                     this._gotoNextShipment();
                     break;
                 }
                 else {
-                    //console.log(`Package ${res.data.shipmentId} was ${res.data.response} by driver ${res.data.driverId} | ${this.driverDistances[res.data.driverId-1] + " miles away"}`);
                     this.numDenies++;
                 }
             }
