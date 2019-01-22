@@ -6,4 +6,12 @@ const shipments = require('./data/shipments.json');
 const DispatchClient = require('./client/dispatchClient.js');
 
 // client instance
-let dispatchClient = new DispatchClient(shipments, drivers);
+new DispatchClient(
+    shipments,
+    drivers,
+    {
+        "runOnInit": true,
+        "driversPerRun": 3,
+        "runInterval": 10,
+    }
+);
